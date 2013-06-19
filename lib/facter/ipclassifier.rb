@@ -26,13 +26,15 @@ nonpublic_subnets = [ createNethash("127.0.0.0", "255.0.0.0"),
                       
                       
 factips = Hash.new
-interfaces.split(",").each do |i|
+interfaces.split(",").sort.each do |i|
   ipaddress = Facter.value("ipaddress_" + i)
   ipint = IPAddr.new(ipaddress).to_i
   
   internal_subnets.each do |sd|
     if (ipint & sd["netmask"]) == sd["subnet"]
-      factips["internal"] = ipaddress
+      if !factips.has_key?("internal")
+        factips["internal"] = ipaddress
+      end
       next
     end
   end
@@ -46,7 +48,7 @@ interfaces.split(",").each do |i|
     end
   end
   
-  if reserved == false
+  if reserved == false and !factips.has_key?("public")
     factips["public"] = ipaddress
   end
 end  
