@@ -26,8 +26,12 @@ nonpublic_subnets = [ createNethash("127.0.0.0", "255.0.0.0"),
 
 
 factips = Hash.new
+factinterface = Hash.new
 interfaces.split(",").sort.each do |i|
   ipaddress = Facter.value("ipaddress_" + i)
+  if not ipaddress =~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/
+    next
+  end
   ipint = IPAddr.new(ipaddress).to_i
 
   internal_subnets.each do |sd|
@@ -35,22 +39,36 @@ interfaces.split(",").sort.each do |i|
       if !factips.has_key?("internal")
         factips["internal"] = ipaddress
       end
+      
+      if !factinterface.has_key?("internal")
+        factinterface["internal"] = [i]
+      else
+        factinterface["internal"].push(i)
+      end
+
       next
+
     end
   end
 
   # Public IP.  Exclude known non-public blocks:
-  if factips.has_key?("public")
-    reserved = false
-    nonpublic_subnets.each do |sd|
-      if (ipint & sd["netmask"]) == sd["subnet"]
-        reserved = true
-        break
-      end
+  reserved = false
+  nonpublic_subnets.each do |sd|
+    if (ipint & sd["netmask"]) == sd["subnet"]
+      reserved = true
+      break
+    end
+  end
+
+  if reserved == false
+    if !factips.has_key?("public")
+      factips["public"] = ipaddress
     end
 
-    if reserved == false
-      factips["public"] = ipaddress
+    if !factinterface.has_key?("public")
+      factinterface["public"] = [i]
+    else
+      factinterface["public"].push(i)
     end
   end
 end
@@ -59,6 +77,14 @@ factips.keys.sort.each do |k|
   Facter.add("ipaddress_" + k) do
     setcode do
       factips[k]
+    end
+  end
+end
+
+factinterface.keys.sort.each do |k|
+  Facter.add("interfaces_" + k) do
+    setcode do
+      factinterface[k].join(',')
     end
   end
 end
