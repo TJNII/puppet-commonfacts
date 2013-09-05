@@ -16,7 +16,7 @@ while (line = file.gets)
     if not data[3] =~ /noauto/i
       # Filesystem type
       case data[2]
-      when "proc", "swap"
+      when "proc", "swap", "devpts", "sysfs", "binfmt_misc", "xenfs"
         next
         
       else
