@@ -19,7 +19,9 @@ So for an example of a Rackspace cloud server with a internal Cloud networks con
 * eth0 is public, 192.250.1.2
 * eth1 is Rackspace servicenet, 10.208.3.4
 * eth2 is a cloud network, 10.1.2.3
+
 Then:
+
 * ipaddress_internal: 10.1.2.3
 * ipaddress_public: 192.250.1.2
 * interfaces_internal: eth2
