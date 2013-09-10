@@ -40,6 +40,6 @@ For each filesystem found, a mounttype_${path} fact is created with the filesyst
 ### WARNING
 As Ruby requires the fact names to be lowercase, the mounttype facts uses the downcase'd path.
 As such there may be colissions if you have mounts like /mnt/foobar and /mnt/FooBar.
-Currently only the first mount will be reported, and the failure WILL BE SILENT!
+Upon collision the non-unique name will be omitted, and the failure WILL BE SILENT!
 The author currently considers this risk acceptable as it is only an issue with confusingly
 named mounts.
